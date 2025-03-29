@@ -1,4 +1,5 @@
 import axios from "axios";
+import Cookies from "js-cookie";
 
 const BASE_URL = "https://reqres.in/";
 
@@ -29,7 +30,14 @@ export const postRequest = async (endpoint, data) => {
 
 export const getRequest = async (endpoint) => {
   try {
-    const response = await axios.get(`${BASE_URL}${endpoint}`);
+    const token = getToken()
+    if (!token) {
+      throw new Error("No token found");
+    }
+    const headers = token ? { Authorization: `Bearer ${token}` } : {}
+    const response = await axios.get(`${BASE_URL}${endpoint}`, {
+      headers,
+    });
     return response.data;
   } catch (error) {
     throw error;

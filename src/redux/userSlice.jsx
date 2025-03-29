@@ -1,24 +1,25 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import axios from "axios";
+import { getRequest } from "../services/api";
 
 const API_ENDPOINTS = {
   LOGIN: "/api/login",
-  USERS: "/api/users?page=1",
+  USERS: "api/users",
 };
 
 export const fetchUsers = createAsyncThunk(
   "users/fetchUsers",
-  async (userData, { rejectWithValue }) => {
+  async (_, { rejectWithValue }) => {
     try {
-      const response = await getRequest(API_ENDPOINTS.USERS, userData);
+      const response = await getRequest(API_ENDPOINTS.USERS);
+      return response.data;
     } catch (error) {
       console.error("API Error:", error.response?.data || error.message);
       const errorMessage =
         error.response?.data?.message || "Something went wrong";
       return rejectWithValue(errorMessage);
     }
-
-    return response.data.data;
+   
   }
 );
 
@@ -29,11 +30,11 @@ export const deleteUser = createAsyncThunk("users/deleteUser", async (id) => {
 
 const userSlice = createSlice({
   name: "users",
-  initialState: { users: [], status: null, error: null, loading: false },
+  initialState: { users: null , status: null, error: null, loading: false },
   reducers: {},
   extraReducers: (builder) => {
     builder
-      .addCase(fetchUsers.pending, (state) => {
+      .addCase(fetchUsers.pending, (state, action) => {
         state.loading = false;
         state.error = action.payload;
       })
@@ -46,7 +47,7 @@ const userSlice = createSlice({
         state.loading = false;
         state.error = action.payload;
       })
-      .addCase(deleteUser.pending, (state) => {
+      .addCase(deleteUser.pending, (state, action) => {
         state.loading = false;
         state.error = action.payload;
       })

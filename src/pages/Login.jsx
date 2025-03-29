@@ -1,35 +1,96 @@
 import { useState } from "react";
 import { useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
+import { EyeIcon, EyeSlashIcon } from "@heroicons/react/24/outline";
+import { appLogin } from "../redux/authSlice";
 
 const Login = () => {
-  const [email, setEmail] = useState("eve.holt@reqres.in");
-  const [password, setPassword] = useState("cityslicka");
-  const [error, setError] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
   const handleLogin = async (e) => {
     e.preventDefault();
+
+    const userData = {
+      email:email,
+      password:password
+    }
     try {
-      const response = await loginUser({ email, password });
-      dispatch(setToken(response.data.token));
-      navigate("/users");
+      const response = await dispatch(appLogin(userData));
+      if(response.meta.requestStatus === "fulfilled"){
+        navigate("/UsersList")
+      }else{
+        console.log("h")
+      }
     } catch (err) {
-      setError("Invalid credentials");
+      console.log(err);
     }
   };
 
+
   return (
-    <div className="flex items-center justify-center h-screen bg-gray-100">
-      <form onSubmit={handleLogin} className="bg-white p-6 rounded-lg shadow-md w-96">
-        <h2 className="text-xl font-bold mb-4">Login</h2>
-        {error && <p className="text-red-500">{error}</p>}
-        <input className="border w-full p-2 mb-3" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="Email" />
-        <input className="border w-full p-2 mb-3" type="password" value={password} onChange={(e) => setPassword(e.target.value)} placeholder="Password" />
-        <button type="submit" className="bg-blue-500 text-white w-full p-2 rounded">Login</button>
+    <div className="flex items-center justify-center  bg-gray-100 p-16">
+    <div className="p-6 bg-white rounded-lg shadow-md w-96">
+      <h2 className="mb-4 text-2xl font-bold text-center ">Login</h2>
+      <form onSubmit={handleLogin}>
+        <label
+          htmlFor="email"
+          className="block text-xl font-medium text-black"
+        >
+          Email
+        </label>
+        <input
+          id="email"
+          name="email"
+          type="text"
+          placeholder="Enter your Email"
+          value={email}
+          onChange={(e)=> setEmail(e.target.value)}
+          className="w-full px-3 py-2 mt-2 mb-1 border rounded-md focus:ring-2 focus:ring-blue-500 focus:outline-none "
+        />
+        <label
+          htmlFor="password"
+          className="block mt-2 text-xl font-medium text-black"
+        >
+          Password
+        </label>
+        <div className="relative mt-2">
+          <input
+            id="password"
+            name="password"
+            type={showPassword ? "text" : "password"}
+            placeholder="Enter your password"
+            value={password}
+            onChange={(e)=>setPassword(e.target.value)}
+            className="w-full px-3 py-2 border rounded-md focus:ring-2 focus:ring-blue-500 focus:outline-none "
+            required
+          />
+          <button
+            type="button"
+            onClick={() => setShowPassword(!showPassword)}
+            className="absolute text-gray-600 right-2 top-2"
+            aria-label={showPassword ? "Hide password" : "Show password"}
+          >
+            {showPassword ? (
+              <EyeSlashIcon className="w-5 h-5" />
+            ) : (
+              <EyeIcon className="w-5 h-5" />
+            )}
+          </button>
+        </div>
+
+        <button
+          type="submit"
+          className="flex items-center justify-center w-full py-2 mt-4 text-white bg-green-500 rounded-full hover:bg-green-600 cursor-pointer"
+        >
+          Submit
+        </button>
       </form>
     </div>
+  </div>
   );
 };
 
