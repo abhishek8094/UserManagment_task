@@ -18,6 +18,56 @@ Routing: React Router
 
 Persistence: Cookies for authentication tokens
 
-## Expanding the ESLint configuration
+🎯 Features
 
-If you are developing a production application, we recommend using TypeScript and enable type-aware lint rules. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+✅ User Authentication (Login & Logout)
+✅ User Listing with Pagination
+✅ Edit & Delete User Functionality
+✅ Error Handling & Form Validation
+✅ Persistent Login Token
+✅ Responsive Design (Mobile & Desktop)
+✅ Client-Side Search & Filtering (Bonus)
+✅ Navigation with React Router (Bonus)
+✅ Hosted Online (Bonus)
+
+🔐 Authentication
+
+Users must log in with valid credentials from the Reqres API.
+
+The authentication token is stored in local storage.
+
+If the token is missing or expired, users are redirected to the login page.
+
+📜 API Endpoints
+
+Login: POST https://reqres.in/api/login
+
+Get Users: GET https://reqres.in/api/users?page={page_number}
+
+Update User: PUT https://reqres.in/api/users/{id}
+
+Delete User: DELETE https://reqres.in/api/users/{id}
+
+🎨 UI & UX
+
+The app is fully responsive and adapts to different screen sizes.
+
+Tailwind CSS is used for a clean and modern look.
+
+Forms include validation to prevent incorrect submissions.
+
+🔍 Bonus Features
+
+Search & Filtering: Users can search for specific users.
+
+React Router: Navigation between login, user list, and edit user pages.
+
+Hosting: The app is deployed on
+
+🤝 Contributing
+
+Feel free to fork this repository, create a new branch, and submit a pull request. Contributions are welcome!
+
+📬 Contact
+
+For any questions or feedback, reach out at cseabhishek8094@gmail.com .
