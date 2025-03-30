@@ -12,7 +12,7 @@ const UsersList = () => {
   const [editingUser, setEditingUser] = useState(null); 
 
   useEffect(() => {
-    dispatch(fetchUsers(1));
+    dispatch(fetchUsers());
   }, [dispatch]);
 
   const offset = currentPage * usersPerPage;
@@ -32,8 +32,8 @@ const UsersList = () => {
     setEditingUser(null);
   };
 
-  const handleDeleteClick = (id) =>{
-    dispatch(removeUser({ id}))
+  const handleDeleteClick = (user) =>{
+    dispatch(removeUser(user.id))
   }
 
   return (

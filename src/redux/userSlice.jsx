@@ -38,9 +38,9 @@ export const updateUser = createAsyncThunk(
 
 export const removeUser = createAsyncThunk(
   "users/removeUser",
-  async (data, { rejectWithValue }) => {
+  async (id , { rejectWithValue }) => {
     try {
-      const response = await deleteRequest(`${API_ENDPOINTS.USERS}/${id}`, data);
+      const response = await deleteRequest(`${API_ENDPOINTS.USERS}/${id}`);
       return response.data;
     } catch (error) {
       console.error("API Error:", error.response?.data || error.message);
@@ -88,6 +88,7 @@ const userSlice = createSlice({
         state.error = action.payload;
       })
       .addCase(removeUser.fulfilled, (state, action) => {
+        state.loading = false;
         state.users = state.users.filter((user) => user.id !== action.payload);
       })
 

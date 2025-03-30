@@ -46,7 +46,15 @@ export const getRequest = async (endpoint) => {
 
 export const putRequest = async (endpoint, data) => {
   try {
-    const response = await axios.put(`${BASE_URL}${endpoint}`, data);
+    const token = getToken()
+    if (!token) {
+      throw new Error("No token found");
+    }
+    const headers = token ? { Authorization: `Bearer ${token}` } : {}
+    const response = await axios.put(`${BASE_URL}${endpoint}`, data, {
+      headers,
+    });
+    console.log("response", response);
     return response.data;
   } catch (error) {
     throw error;
@@ -55,7 +63,14 @@ export const putRequest = async (endpoint, data) => {
 
 export const deleteRequest = async (endpoint) => {
   try {
-    const response = await axios.delete(`${BASE_URL}${endpoint}`);
+    const token = getToken()
+    if (!token) {
+      throw new Error("No token found");
+    }
+    const headers = token ? { Authorization: `Bearer ${token}` } : {}
+    const response = await axios.delete(`${BASE_URL}${endpoint}`, {
+      headers,
+    });
     return response.data;
   } catch (error) {
     throw error;
