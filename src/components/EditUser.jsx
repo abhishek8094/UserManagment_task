@@ -1,6 +1,6 @@
 import React, { useState } from "react";;
 
-const EditUserForm = ({ user, onSave, onCancel }) => {
+const EditUser = ({ user, onSave, onCancel }) => {
 
   const [editUserData, setEditUserData] = useState({
     first_name: user.first_name || "",
@@ -65,4 +65,4 @@ const EditUserForm = ({ user, onSave, onCancel }) => {
   );
 };
 
-export default EditUserForm;
+export default EditUser;

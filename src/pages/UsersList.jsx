@@ -2,18 +2,19 @@ import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchUsers , updateUser, removeUser} from "../redux/userSlice";
 import ReactPaginate from "react-paginate";
-import EditUserForm from "../components/EditUserForm";
+import EditUser from "../components/EditUser";
 
 const UsersList = () => {
   const dispatch = useDispatch();
   const { users } = useSelector((state) => state?.users);
+  const [page, setPage] = useState(1);
   const [currentPage, setCurrentPage] = useState(0);
-  const usersPerPage = 5;
+  const usersPerPage = 6;
   const [editingUser, setEditingUser] = useState(null); 
 
   useEffect(() => {
-    dispatch(fetchUsers());
-  }, [dispatch]);
+    dispatch(fetchUsers(page));
+  }, [dispatch, page]);
 
   const offset = currentPage * usersPerPage;
   const currentUsers = users?.slice(offset, offset + usersPerPage);
@@ -27,13 +28,14 @@ const UsersList = () => {
     setEditingUser(user);
   };
 
-  const handleUpdateUser = (id, updatedData) => {
+  const handleUpdateUser = async (id, updatedData) => {
     dispatch(updateUser({ id, ...updatedData }));
+    await dispatch(fetchUsers()); 
     setEditingUser(null);
   };
 
-  const handleDeleteClick = (user) =>{
-    dispatch(removeUser(user.id))
+  const handleDeleteClick = (id) =>{
+    dispatch(removeUser(id))
   }
 
   return (
@@ -62,7 +64,7 @@ const UsersList = () => {
                   <button className="bg-blue-500 text-white px-3 py-1 rounded mr-2 cursor-pointer" onClick={() => handleEditClick(user)}>
                     Edit
                   </button>
-                  <button className="bg-red-500 text-white px-3 py-1 rounded cursor-pointer" onClick={() => handleDeleteClick(user)}>
+                  <button className="bg-red-500 text-white px-3 py-1 rounded cursor-pointer" onClick={() => handleDeleteClick(user.id)}>
                     Delete
                   </button>
                 </td>
@@ -89,7 +91,7 @@ const UsersList = () => {
       />
 
       {editingUser && (
-        <EditUserForm
+        <EditUser
           user={editingUser}
           onSave={handleUpdateUser}
           onCancel={() => setEditingUser(null)}

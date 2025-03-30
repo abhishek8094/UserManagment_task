@@ -8,9 +8,9 @@ const API_ENDPOINTS = {
 
 export const fetchUsers = createAsyncThunk(
   "users/fetchUsers",
-  async (_, { rejectWithValue }) => {
+  async (page, { rejectWithValue }) => {
     try {
-      const response = await getRequest(API_ENDPOINTS.USERS);
+      const response = await getRequest(`${API_ENDPOINTS.USERS}?page=${page}`);
       return response.data;
     } catch (error) {
       console.error("API Error:", error.response?.data || error.message);
@@ -41,7 +41,7 @@ export const removeUser = createAsyncThunk(
   async (id , { rejectWithValue }) => {
     try {
       const response = await deleteRequest(`${API_ENDPOINTS.USERS}/${id}`);
-      return response.data;
+      return response;
     } catch (error) {
       console.error("API Error:", error.response?.data || error.message);
       const errorMessage =
@@ -76,8 +76,12 @@ const userSlice = createSlice({
       })
       .addCase(updateUser.fulfilled, (state, action) => {
         state.loading = false;
-        state.users = action.payload;
+        const updatedUser = action.meta.arg; 
+        state.users = state.users.map(user => 
+          user.id === updatedUser.id ? { ...user, ...updatedUser } : user
+        );
       })
+      
 
       .addCase(updateUser.rejected, (state, action) => {
         state.loading = false;
@@ -89,8 +93,9 @@ const userSlice = createSlice({
       })
       .addCase(removeUser.fulfilled, (state, action) => {
         state.loading = false;
-        state.users = state.users.filter((user) => user.id !== action.payload);
+        state.users = state.users.filter((user) => user.id !== action.meta.arg); 
       })
+      
 
       .addCase(removeUser.rejected, (state, action) => {
         state.loading = false;
