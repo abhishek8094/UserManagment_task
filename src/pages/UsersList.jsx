@@ -1,18 +1,18 @@
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { fetchUsers } from "../redux/userSlice"; 
+import { fetchUsers , updateUser, removeUser} from "../redux/userSlice";
 import ReactPaginate from "react-paginate";
+import EditUserForm from "../components/EditUserForm";
 
 const UsersList = () => {
   const dispatch = useDispatch();
   const { users } = useSelector((state) => state?.users);
   const [currentPage, setCurrentPage] = useState(0);
   const usersPerPage = 5;
-  const [editUserId, setEditUserId] = useState(null);
-  const [editUserData, setEditUserData] = useState({ first_name: "", last_name: "", email: "" });
+  const [editingUser, setEditingUser] = useState(null); 
 
   useEffect(() => {
-    dispatch(fetchUsers());
+    dispatch(fetchUsers(1));
   }, [dispatch]);
 
   const offset = currentPage * usersPerPage;
@@ -24,18 +24,17 @@ const UsersList = () => {
   };
 
   const handleEditClick = (user) => {
-    setEditUserId(user.id);
-    setEditUserData({ first_name: user.first_name, last_name: user.last_name, email: user.email });
+    setEditingUser(user);
   };
 
-  const handleInputChange = (e) => {
-    setEditUserData({ ...editUserData, [e.target.name]: e.target.value });
+  const handleUpdateUser = (id, updatedData) => {
+    dispatch(updateUser({ id, ...updatedData }));
+    setEditingUser(null);
   };
 
-  const handleUpdateClick = (id) => {
-    dispatch(updateUser({ id, ...editUserData }));
-    setEditUserId(null); 
-  };
+  const handleDeleteClick = (id) =>{
+    dispatch(removeUser({ id}))
+  }
 
   return (
     <div className="p-6">
@@ -57,57 +56,16 @@ const UsersList = () => {
                 <td className="py-2 px-4 border">
                   <img src={user.avatar} alt={user.first_name} className="w-10 h-10 rounded-full mx-auto" />
                 </td>
-
-                {editUserId === user.id ? (
-                  <>
-                    <td className="py-2 px-4 border">
-                      <input
-                        type="text"
-                        name="first_name"
-                        value={editUserData.first_name}
-                        onChange={handleInputChange}
-                        className="border px-2 py-1 w-full"
-                      />
-                      <input
-                        type="text"
-                        name="last_name"
-                        value={editUserData.last_name}
-                        onChange={handleInputChange}
-                        className="border px-2 py-1 w-full mt-1"
-                      />
-                    </td>
-                    <td className="py-2 px-4 border">
-                      <input
-                        type="email"
-                        name="email"
-                        value={editUserData.email}
-                        onChange={handleInputChange}
-                        className="border px-2 py-1 w-full"
-                      />
-                    </td>
-                    <td className="py-2 px-4 border">
-                      <button className="bg-green-500 text-white px-3 py-1 rounded mr-2" onClick={() => handleUpdateClick(user.id)}>
-                        Update
-                      </button>
-                      <button className="bg-gray-400 text-white px-3 py-1 rounded" onClick={() => setEditUserId(null)}>
-                        Cancel
-                      </button>
-                    </td>
-                  </>
-                ) : (
-                  <>
-                    <td className="py-2 px-4 border">{user.first_name} {user.last_name}</td>
-                    <td className="py-2 px-4 border">{user.email}</td>
-                    <td className="py-2 px-4 border">
-                      <button className="bg-blue-500 text-white px-3 py-1 rounded mr-2" onClick={() => handleEditClick(user)}>
-                        Edit
-                      </button>
-                      <button className="bg-red-500 text-white px-3 py-1 rounded" onClick={() => dispatch(removeUser(user.id))}>
-                        Delete
-                      </button>
-                    </td>
-                  </>
-                )}
+                <td className="py-2 px-4 border">{user.first_name} {user.last_name}</td>
+                <td className="py-2 px-4 border">{user.email}</td>
+                <td className="py-2 px-4 border">
+                  <button className="bg-blue-500 text-white px-3 py-1 rounded mr-2 cursor-pointer" onClick={() => handleEditClick(user)}>
+                    Edit
+                  </button>
+                  <button className="bg-red-500 text-white px-3 py-1 rounded cursor-pointer" onClick={() => handleDeleteClick(user)}>
+                    Delete
+                  </button>
+                </td>
               </tr>
             ))}
           </tbody>
@@ -129,6 +87,14 @@ const UsersList = () => {
         nextClassName={"border px-3 py-1 rounded cursor-pointer"}
         breakClassName={"border px-3 py-1 rounded cursor-pointer"}
       />
+
+      {editingUser && (
+        <EditUserForm
+          user={editingUser}
+          onSave={handleUpdateUser}
+          onCancel={() => setEditingUser(null)}
+        />
+      )}
     </div>
   );
 };

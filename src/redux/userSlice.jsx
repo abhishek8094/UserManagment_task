@@ -1,6 +1,5 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
-import axios from "axios";
-import { getRequest } from "../services/api";
+import { getRequest, putRequest, deleteRequest } from "../services/api";
 
 const API_ENDPOINTS = {
   LOGIN: "/api/login",
@@ -19,18 +18,42 @@ export const fetchUsers = createAsyncThunk(
         error.response?.data?.message || "Something went wrong";
       return rejectWithValue(errorMessage);
     }
-   
   }
 );
 
-export const deleteUser = createAsyncThunk("users/deleteUser", async (id) => {
-  await axios.delete(`https://reqres.in/api/users/${id}`);
-  return id;
-});
+export const updateUser = createAsyncThunk(
+  "users/updateUser",
+  async ({ id, ...data }, { rejectWithValue }) => {
+    try {
+      const response = await putRequest(`${API_ENDPOINTS.USERS}/${id}`, data);
+      return response.data;
+    } catch (error) {
+      console.error("API Error:", error.response?.data || error.message);
+      const errorMessage =
+        error.response?.data?.message || "Something went wrong";
+      return rejectWithValue(errorMessage);
+    }
+  }
+);
+
+export const removeUser = createAsyncThunk(
+  "users/removeUser",
+  async (data, { rejectWithValue }) => {
+    try {
+      const response = await deleteRequest(`${API_ENDPOINTS.USERS}/${id}`, data);
+      return response.data;
+    } catch (error) {
+      console.error("API Error:", error.response?.data || error.message);
+      const errorMessage =
+        error.response?.data?.message || "Something went wrong";
+      return rejectWithValue(errorMessage);
+    }
+  }
+);
 
 const userSlice = createSlice({
   name: "users",
-  initialState: { users: null , status: null, error: null, loading: false },
+  initialState: { users: null, status: null, error: null, loading: false },
   reducers: {},
   extraReducers: (builder) => {
     builder
@@ -47,15 +70,28 @@ const userSlice = createSlice({
         state.loading = false;
         state.error = action.payload;
       })
-      .addCase(deleteUser.pending, (state, action) => {
+      .addCase(updateUser.pending, (state, action) => {
         state.loading = false;
         state.error = action.payload;
       })
-      .addCase(deleteUser.fulfilled, (state, action) => {
+      .addCase(updateUser.fulfilled, (state, action) => {
+        state.loading = false;
+        state.users = action.payload;
+      })
+
+      .addCase(updateUser.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      })
+      .addCase(removeUser.pending, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      })
+      .addCase(removeUser.fulfilled, (state, action) => {
         state.users = state.users.filter((user) => user.id !== action.payload);
       })
 
-      .addCase(deleteUser.rejected, (state, action) => {
+      .addCase(removeUser.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload;
       });
